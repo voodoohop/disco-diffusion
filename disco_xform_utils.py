@@ -13,8 +13,12 @@ except:
 
 MAX_ADABINS_AREA = 500000
 
+infer_helper = None
+
 @torch.no_grad()
 def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_mat=torch.eye(3).unsqueeze(0), translate=(0.,0.,-0.04), near=2000, far=20000, fov_deg=60, padding_mode='border', sampling_mode='bicubic', midas_weight = 0.3):
+    global infer_helper
+    
     img_pil = Image.open(open(img_filepath, 'rb')).convert('RGB')
     w, h = img_pil.size
     image_tensor = torchvision.transforms.functional.to_tensor(img_pil).to(device)
@@ -27,7 +31,8 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
         predictions using nyu dataset
         """
         print("Running AdaBins depth estimation implementation...")
-        infer_helper = InferenceHelper(dataset='nyu')
+        if infer_helper is None:
+            infer_helper = InferenceHelper(dataset='nyu')
 
         image_pil_area = w*h
         if image_pil_area > MAX_ADABINS_AREA:
