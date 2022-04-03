@@ -46,6 +46,7 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
             adabins_depth_np = adabins_depth.cpu().numpy()
         except:
             pass
+        print("Done AdaBins")
 
     torch.cuda.empty_cache()
 
