@@ -4,6 +4,7 @@ import sys
 import midas_utils
 import numpy as np
 import py3d_tools as p3d
+import scipy
 import torch
 import torchvision
 from PIL import Image
@@ -90,7 +91,25 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
     depth_tensor = torch.from_numpy(depth_map).squeeze().to(device)
 
     print("depth_map", depth_map.shape, "min", np.min(depth_map), "max", np.max(depth_map))
+    
     print("rot_mat", rot_mat, "translate", translate)
+    
+    # calculate min and max of the depth map
+    depth_min = np.min(depth_map)
+    depth_max = np.max(depth_map)
+
+    # create a normalized copy of the depth map
+    depth_map_normalized = (depth_map[0] - depth_min) / (depth_max - depth_min)
+
+    # depth map normalized is of shape (H, W)
+
+    # blur the depth map using scipy
+    depth_map_normalized_blurred = scipy.ndimage.gaussian_filter(depth_map_normalized, sigma=5.0)
+
+    # get the coordinate of the highest value in the depth map
+    depth_map_normalized_max_coord = np.unravel_index(np.argmax(depth_map_normalized_blurred), depth_map_normalized_blurred.shape)
+    print("depth_map_normalized_max_coord", depth_map_normalized_max_coord)
+
     pixel_aspect = 1.0 # really.. the aspect of an individual pixel! (so usually 1.0)
     persp_cam_old = p3d.FoVPerspectiveCameras(near, far, pixel_aspect, fov=fov_deg, degrees=True, device=device)
     persp_cam_new = p3d.FoVPerspectiveCameras(near, far, pixel_aspect, fov=fov_deg, degrees=True, R=rot_mat, T=torch.tensor([translate]), device=device)
