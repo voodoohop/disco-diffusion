@@ -20,7 +20,7 @@ MAX_ADABINS_AREA = 500000
 infer_helper = None
 
 @torch.no_grad()
-def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_mat=torch.eye(3).unsqueeze(0), translate=(0.,0.,-0.04), near=2000, far=20000, fov_deg=60, padding_mode='border', sampling_mode='bicubic', midas_weight = 0.3):
+def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_mat=torch.eye(3).unsqueeze(0), translate=(0.,0.,-0.04), near=2000, far=20000, fov_deg=60, padding_mode='border', sampling_mode='bicubic', midas_weight = 0.3, return_depth_map=False):
     global infer_helper
     
     img_pil = Image.open(open(img_filepath, 'rb')).convert('RGB')
@@ -135,4 +135,7 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
 
     torch.cuda.empty_cache()
 
-    return img_pil
+    if return_depth_map:
+        return img_pil, depth_map_normalized
+    else:
+        return img_pil
