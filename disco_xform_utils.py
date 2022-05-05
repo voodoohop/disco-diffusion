@@ -1,9 +1,12 @@
-import torch, torchvision
-import py3d_tools as p3d
+import math
+import sys
+
 import midas_utils
-from PIL import Image
 import numpy as np
-import sys, math
+import py3d_tools as p3d
+import torch
+import torchvision
+from PIL import Image
 
 try:
     from infer import InferenceHelper
@@ -86,6 +89,8 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
     depth_map = np.expand_dims(depth_map, axis=0)
     depth_tensor = torch.from_numpy(depth_map).squeeze().to(device)
 
+    print("depth_map", depth_map)]
+    print("rot_mat", rot_mat, "translate", translate)
     pixel_aspect = 1.0 # really.. the aspect of an individual pixel! (so usually 1.0)
     persp_cam_old = p3d.FoVPerspectiveCameras(near, far, pixel_aspect, fov=fov_deg, degrees=True, device=device)
     persp_cam_new = p3d.FoVPerspectiveCameras(near, far, pixel_aspect, fov=fov_deg, degrees=True, R=rot_mat, T=torch.tensor([translate]), device=device)
