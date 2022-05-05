@@ -104,7 +104,7 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
     # depth map normalized is of shape (H, W)
 
     # blur the depth map using scipy
-    depth_map_normalized_blurred = scipy.ndimage.gaussian_filter(depth_map_normalized, sigma=5.0)
+    depth_map_normalized_blurred = depth_map_normalized
 
     # get the coordinate of the highest value in the depth map
     depth_map_normalized_max_coord = np.unravel_index(np.argmax(depth_map_normalized_blurred), depth_map_normalized_blurred.shape)
