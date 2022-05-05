@@ -89,7 +89,7 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
     depth_map = np.expand_dims(depth_map, axis=0)
     depth_tensor = torch.from_numpy(depth_map).squeeze().to(device)
 
-    print("depth_map", depth_map, "min", np.min(depth_map), "max", np.max(depth_map))
+    print("depth_map", depth_map.shape, "min", np.min(depth_map), "max", np.max(depth_map)
     print("rot_mat", rot_mat, "translate", translate)
     pixel_aspect = 1.0 # really.. the aspect of an individual pixel! (so usually 1.0)
     persp_cam_old = p3d.FoVPerspectiveCameras(near, far, pixel_aspect, fov=fov_deg, degrees=True, device=device)
