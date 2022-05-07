@@ -103,13 +103,6 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
 
     # depth map normalized is of shape (H, W)
 
-    # blur the depth map using scipy
-    depth_map_normalized_blurred = depth_map_normalized
-
-    # get the coordinate of the highest value in the depth map
-    depth_map_normalized_max_coord = np.unravel_index(np.argmax(depth_map_normalized_blurred), depth_map_normalized_blurred.shape)
-    #print("depth_map_normalized_max_coord", depth_map_normalized_max_coord)
-
     pixel_aspect = 1.0 # really.. the aspect of an individual pixel! (so usually 1.0)
     persp_cam_old = p3d.FoVPerspectiveCameras(near, far, pixel_aspect, fov=fov_deg, degrees=True, device=device)
     persp_cam_new = p3d.FoVPerspectiveCameras(near, far, pixel_aspect, fov=fov_deg, degrees=True, R=rot_mat, T=torch.tensor([translate]), device=device)
