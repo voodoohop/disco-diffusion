@@ -34,6 +34,7 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
         """
         predictions using nyu dataset
         """
+        adabins_depth_np = None
         print("Running AdaBins depth estimation implementation...")
         if infer_helper is None:
             infer_helper = InferenceHelper(dataset='nyu')
@@ -48,8 +49,9 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
             _, adabins_depth = infer_helper.predict_pil(depth_input)
             adabins_depth = torchvision.transforms.functional.resize(torch.from_numpy(adabins_depth), image_tensor.shape[-2:], interpolation=torchvision.transforms.functional.InterpolationMode.BICUBIC).squeeze().to(device)
             adabins_depth_np = adabins_depth.cpu().numpy()
-        except:
-            pass
+        except Exception as e:
+            print("Failed to run AdaBins depth estimation. Falling back to default depth estimation.", e)
+            pass    
         print("Done AdaBins")
 
     torch.cuda.empty_cache()
@@ -81,7 +83,7 @@ def transform_image_3d(img_filepath, midas_model, midas_transform, device, rot_m
     prediction_np = np.subtract(50.0, prediction_np)
     prediction_np = prediction_np / 19.0
 
-    if use_adabins:
+    if use_adabins and adabins_depth_np is not None:
         adabins_weight = 1.0 - midas_weight
         depth_map = prediction_np*midas_weight + adabins_depth_np*adabins_weight
     else:
